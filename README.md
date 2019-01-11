@@ -24,15 +24,18 @@ I've only tried this with Python 3, but feel free to give it a go with version 2
 1. Download the data from [here](https://console.cloud.google.com/storage/browser/gqn-datasets). By default the loader will assume that the data folder is on the same level as this repository. You can also set the data location from the CLI.
 
 2. Install dependencies (if you work with virtualenv or conda, it's probably good practice to set up a new environment first).
+
         pip install -r requirements.txt
 
 
 2. If you want live monitoring using Visdom, start the server
+
         python -m visdom.server -port 8080
 
    trixi uses port 8080 by default instead of 8097.
 
 3. Run the experiment with
+
         python run.py OUTPUT_FOLDER [-v]
 
    where -v indicates you want to use a VisdomLogger. If you look into run.py, you will find a rather large default Config. Everything in this Config will be exposed to the command line automatically, as is described in the [trixi docs](https://trixi.readthedocs.io/en/latest/_api/trixi.util.html#module-trixi.util.config). For example, if you don't want to hardcode the location of the data, you can just use the data_dir attribute via `--data_dir SOME_OTHER_LOCATION`. So far there is only one mod SHAREDCORES, i.e. modification to the default Config, but in principle mods are designed to be combined, e.g. `-m MOD1 MOD2`. You can of course resume experiments and do everything else that trixi offers.
