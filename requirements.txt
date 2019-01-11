@@ -1,0 +1,2 @@
+trixi>=0.1.1.1
+-e git://github.com/MIC-DKFZ/batchgenerators#egg=batchgenerators
