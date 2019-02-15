@@ -116,11 +116,15 @@ def run_experiment(experiment, configs, args, mods=None, **kwargs):
             if skip_this:
                 continue
 
+        loggers = {}
+        if args.visdomlogger:
+            loggers["visdom"] = ("visdom", {}, 1)
+
         exp = experiment(config=config,
                          base_dir=args.base_dir,
-                         use_visdomlogger=args.visdomlogger,
                          resume=args.resume,
                          ignore_resume_config=args.ignore_resume_config,
+                         loggers=loggers,
                          **kwargs)
 
         if not args.test:

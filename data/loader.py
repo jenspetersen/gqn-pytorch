@@ -1,15 +1,16 @@
 import numpy as np
 import os
 from batchgenerators.dataloading.data_loader import SlimDataLoaderBase
+from .datasets import all_datasets
 
-data_dir = "../../shepard_metzler_5_parts"
+data_dir = "../../"
 file_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(file_dir, data_dir)
 
 
-def split(N=5, seed=1):
+def split(dataset="shepard_metzler_5_parts", N=5, seed=1):
 
-    indices = np.arange(810000)
+    indices = np.arange(all_datasets[dataset][2])
     r = np.random.RandomState(seed)
     r.shuffle(indices)
     num = len(indices) // N
@@ -22,15 +23,16 @@ def split(N=5, seed=1):
     return splits
 
 
-def load(mode="train"):
+def load(dataset="shepard_metzler_5_parts", mode="train", image_kwargs=None, viewpoint_kwargs=None):
+    """Use image_kwargs and viewpoint_kwargs to set e.g. mmap_mode."""
 
-    shape = [810000, 15, 64, 64, 3]
-    if mode == "test":
-        shape[0] = 200000
-    shape = tuple(shape)
+    data_dir_ = os.path.join(data_dir, dataset)
 
-    images = np.memmap(os.path.join(data_dir, "{}_images.npy".format(mode)), mode="r", dtype=np.uint8, shape=shape)
-    viewpoints = np.load(os.path.join(data_dir, "{}_viewpoints.npy".format(mode)))
+    if image_kwargs is None: image_kwargs = {}
+    if viewpoint_kwargs is None: viewpoint_kwargs = {}
+
+    images = np.load(os.path.join(data_dir_, "{}_images.npy".format(mode)), **image_kwargs)
+    viewpoints = np.load(os.path.join(data_dir_, "{}_viewpoints.npy".format(mode)), **viewpoint_kwargs)
 
     return {"data": images, "viewpoints": viewpoints}
 
@@ -51,7 +53,7 @@ class LinearBatchGenerator(SlimDataLoaderBase):
                  data,
                  batch_size,
                  dtype=np.float32,
-                 num_viewpoints=15,  # both input and query
+                 num_viewpoints=10,  # both input and query
                  shuffle_viewpoints=False,
                  data_order=None,
                  **kwargs):

@@ -11,7 +11,7 @@ from trixi.experiment import PytorchExperiment
 
 from model import GenerativeQueryNetwork
 from util import get_default_experiment_parser, set_seeds, run_experiment
-from loader import shepardmetzler5
+from data import loader
 
 
 DESCRIPTION = """This experiment just tries to reproduce GQN results,
@@ -34,11 +34,12 @@ def make_defaults():
         # Data
         split_val=3,  # index for set of 5
         split_test=4,  # index for set of 5
-        data_module=shepardmetzler5,
+        data_module=loader,
+        dataset="shepard_metzler_5_parts",
         data_dir=None,  # will be set for data_module if not None
         debug=0,  # 1 for single repeating batch, 2 for single viewpoint (i.e. reconstruct known images)
-        generator_train=shepardmetzler5.RandomBatchGenerator,
-        generator_val=shepardmetzler5.LinearBatchGenerator,
+        generator_train=loader.RandomBatchGenerator,
+        generator_val=loader.LinearBatchGenerator,
         num_viewpoints_val=8,  # use this many viewpoints in validation
         shuffle_viewpoints_val=False,
         augmenter=MultiThreadedAugmenter,
@@ -118,11 +119,11 @@ class GQNExperiment(PytorchExperiment):
             c.data_module.data_dir = c.data_dir
 
         # set actual data
-        self.data_train_val = c.data_module.load("train")
-        self.data_test = c.data_module.load("test")
+        self.data_train_val = c.data_module.load(c.dataset, "train", image_kwargs={"mmap_mode": "r"})
+        self.data_test = c.data_module.load(c.dataset, "test", image_kwargs={"mmap_mode": "r"})
 
         # train, val, test split
-        indices_split = c.data_module.split()
+        indices_split = c.data_module.split(c.dataset)
         indices_val = indices_split[c.split_val]
         indices_test = indices_split[c.split_test]
         indices_train = []
