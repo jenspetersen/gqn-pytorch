@@ -1,3 +1,5 @@
+# Adapted from https://github.com/l3robot/gqn_datasets_translator
+
 import os
 import numpy as np
 from numpy.lib.format import open_memmap
